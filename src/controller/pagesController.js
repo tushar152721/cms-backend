@@ -41,7 +41,7 @@ const createPage = async (req, res) => {
 
 const pagesDetail = async (req, res) => {
   try {
-    const findData = await pagesModel.find({isDeleted:false});
+    const findData = await pagesModel.find({ isDeleted: false });
     if (findData) {
       return res.status(200).json({
         success: true,
@@ -97,30 +97,32 @@ const updatePages = async (req, res) => {
     return;
   }
 };
-const deletePages = async(req,res)=>{
-  try{
-    const {_id } = req.query;
-    const deleteContactDetail = await pagesModel.findOneAndUpdate({_id:_id},{isDeleted:true})
-    if(deleteContactDetail){
-        return res.status(200).json({
-            success:true,
-            mesage:"Page deleted successfully",
-            data: []
-        })
-    }else{
-        return res.status(500).json({
-            success:false,
-            message:"Page not found"
-        })
+const deletePages = async (req, res) => {
+  try {
+    const { _id } = req.query;
+    const deleteContactDetail = await pagesModel.findOneAndUpdate(
+      { _id: _id },
+      { isDeleted: true }
+    );
+    if (deleteContactDetail) {
+      return res.status(200).json({
+        success: true,
+        mesage: "Page deleted successfully",
+        data: [],
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        message: "Page not found",
+      });
     }
+  } catch (error) {
+    console.log("error", error);
   }
-  catch(error){
-    console.log("error",error)
-  }
-}
+};
 module.exports = {
   createPage,
   pagesDetail,
   updatePages,
-  deletePages
+  deletePages,
 };
