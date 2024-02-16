@@ -89,30 +89,30 @@ const updatePages = async (req, res) => {
       slug: slug(pagename, "_"),
     };
     let findSlugData = await pagesModel.findOne({ slug: updatePayload.slug });
-    if (findSlugData !== null) {
-      return res.status(409).json({
-        success: false,
-        mesage: "page is already exists",
+    // if (findSlugData !== null) {
+    //   return res.status(409).json({
+    //     success: false,
+    //     mesage: "page is already exists",
+    //     data: [],
+    //   });
+    // } else {
+    const updateContactData = await pagesModel.findOneAndUpdate(
+      { _id: _id },
+      updatePayload
+    );
+    if (updateContactData) {
+      return res.status(200).json({
+        success: true,
+        mesage: "Page updated successfully",
         data: [],
       });
     } else {
-      const updateContactData = await pagesModel.findOneAndUpdate(
-        { _id: _id },
-        updatePayload
-      );
-      if (updateContactData) {
-        return res.status(200).json({
-          success: true,
-          mesage: "Page updated successfully",
-          data: [],
-        });
-      } else {
-        return res.status(500).json({
-          success: false,
-          message: "Page detail not found",
-        });
-      }
+      return res.status(500).json({
+        success: false,
+        message: "Page detail not found",
+      });
     }
+    // }
   } catch (error) {
     console.log("error", error);
     return;
