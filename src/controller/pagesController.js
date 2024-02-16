@@ -1,7 +1,8 @@
 const pagesModel = require("../model/pagesModel");
 const { responseMessage } = require("../constant/messages");
 const slug = require("slugify");
-const { pageValidation } = require('../validation/pageValidation')
+const { pageValidation } = require("../validation/pageValidation");
+const mongoose  = require("mongoose");
 const { CONTACT, STATUS, STATUSCODE } = responseMessage;
 
 const createPage = async (req, res) => {
@@ -10,7 +11,7 @@ const createPage = async (req, res) => {
     const { error } = pageValidation.validate(payloadData);
     if (error) {
       return res.status(400).json({ error: error.details[0].message });
-    }else{
+    } else {
       let checkSlug = slug(payloadData.pagename, "_");
       const updatePayload = {
         ...payloadData,
@@ -38,7 +39,6 @@ const createPage = async (req, res) => {
           });
         }
       }
-  
     }
   } catch (error) {
     console.log("error", error);
@@ -48,30 +48,33 @@ const createPage = async (req, res) => {
 
 const pagesDetail = async (req, res) => {
   try {
-    const { _id } = req.query
-    if(_id){
-        const findData = await pagesModel.findById({_id:_id,isDeleted: false});
-        return res.status(STATUSCODE.success).json({
-          status: STATUS.success,
-          message: "Pages get successfully",
+    const { _id } = req.query;
+    if (_id) {
+      const findData = await pagesModel.findById({
+        _id: _id,
+        isDeleted: false,
+      });
+      return res.status(STATUSCODE.success).json({
+        status: STATUS.success,
+        message: "Pages get successfully",
+        data: findData,
+      });
+    } else {
+      const findData = await pagesModel.find({ isDeleted: false });
+      if (findData) {
+        return res.status(200).json({
+          success: true,
+          mesage: "Pages get successfully",
           data: findData,
         });
-      }else{
-        const findData = await pagesModel.find({ isDeleted: false });
-        if (findData) {
-          return res.status(200).json({
-            success: true,
-            mesage: "Pages get successfully",
-            data: findData,
-          });
-        } else {
-          return res.status(404).json({
-            success: true,
-            message: "No data found",
-            data: [],
-          });
-        }
+      } else {
+        return res.status(404).json({
+          success: true,
+          message: "No data found",
+          data: [],
+        });
       }
+    }
   } catch (error) {
     console.log("error", error);
     return error;
@@ -90,6 +93,7 @@ const updatePages = async (req, res) => {
       return res.status(409).json({
         success: false,
         mesage: "page is already exists",
+        data: [],
       });
     } else {
       const updateContactData = await pagesModel.findOneAndUpdate(
@@ -137,9 +141,43 @@ const deletePages = async (req, res) => {
     console.log("error", error);
   }
 };
+
+const findPagesDetails = async (req, res) => {
+  try {
+    const { _id } = req.query;
+    const data = await pagesModel.aggregate([
+      { $match: { _id: mongoose.Types.ObjectId(_id) } },
+      {
+        $lookup: {
+          from: "contacts",
+          localField: "_id",
+          foreignField: "page",
+          as: "page",
+        },
+      },
+      {
+        $unwind: {
+          path: "$page",
+        },
+      },
+      {
+        $lookup: {
+          from: "services",
+          localField: "_id",
+          foreignField: "page",
+          as: "page",
+        },
+      },
+    ]);
+    console.log("data", data);
+  } catch (error) {
+    console.log("error", error);
+  }
+};
 module.exports = {
   createPage,
   pagesDetail,
   updatePages,
   deletePages,
+  findPagesDetails,
 };

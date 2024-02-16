@@ -7,6 +7,7 @@ pagesRouter.post("/create", pagesController.createPage);
 pagesRouter.get("/list", pagesController.pagesDetail);
 pagesRouter.put("/update", pagesController.updatePages);
 pagesRouter.delete("/delete", pagesController.deletePages);
+pagesRouter.get('/getPageDetail',pagesController.findPagesDetails)
 
 module.exports = {
   pagesRouter,
