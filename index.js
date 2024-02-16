@@ -19,8 +19,8 @@ server.use(express.json());
 server.use("/api/v1", routes);
 server.use("/static", express.static(__dirname + "/public"));
 
-server.listen(5000, () => {
-  console.log("server is calling in 5000 port");
+server.listen(9000, () => {
+  console.log("server is calling in 9000 port");
 });
 process.on("SIGINT", () => {
   cronJob.stop();

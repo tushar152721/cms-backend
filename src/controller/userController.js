@@ -4,55 +4,76 @@ const { USER, ERROR, STATUS, JWT, LOGINSTATUS, STATUSCODE } = responseMessage;
 const { passworDycription } = require("../utils/hasPassword");
 const { passwordProcess } = require("../utils/comparePassword");
 const { generateJWTToken } = require("../utils/generateJWTToken");
+const { userValidation } = require("../validation/userValidation");
 
 const createUser = async (req, res) => {
   try {
     const payloadData = req.body;
-    let findData = await users.findOne({ email: payloadData.email });
-    if (findData !== null) {
-      return res.status(STATUSCODE.unsuccess).json({
-        success: false,
-        message: USER.UserAlradyExiest,
-      });
-    } else {
-      if (payloadData) {
-        const { hashPassword, slat } = await passworDycription(
-          payloadData.password
-        );
-        let updatedPayload = {
-          ...payloadData,
-          password: hashPassword,
-          slat: slat,
-        };
-        const newUser = new users(updatedPayload);
-        const saveResponse = await newUser.save();
-        if (saveResponse) {
-          return res.status(STATUSCODE.success).json({
-            status: STATUS.success,
-            message: USER.AddUser,
-          });
-        } else {
-          return res.status(STATUSCODE.internallIssue).json({
-            status: STATUS.success,
-            message: ERROR.Error,
-          });
+    const { error } = userValidation.validate(payloadData);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }else{
+      let findData = await users.findOne({ email: payloadData.email });
+      if (findData !== null) {
+        return res.status(STATUSCODE.unsuccess).json({
+          success: false,
+          message: USER.UserAlradyExiest,
+          data:[]
+        });
+      } else {
+        if (payloadData) {
+          const { hashPassword, slat } = await passworDycription(
+            payloadData.password
+          );
+          let updatedPayload = {
+            ...payloadData,
+            password: hashPassword,
+            slat: slat,
+          };
+          const newUser = new users(updatedPayload);
+          const saveResponse = await newUser.save();
+          if (saveResponse) {
+            return res.status(STATUSCODE.success).json({
+              status: STATUS.success,
+              message: USER.AddUser,
+              data:[]
+            });
+          } else {
+            return res.status(STATUSCODE.internallIssue).json({
+              status: STATUS.success,
+              message: ERROR.Error,
+              data:[]
+            });
+          }
         }
-      }
+      }  
     }
+      
   } catch (error) {
     throw error;
   }
 };
 const getUser = async (req, res) => {
   try {
-    const findUser = await users.find();
-    if (findUser) {
-      return res.status(STATUSCODE.success).json({
-        status: STATUS.success,
-        message: USER.GetUser,
-        data: findUser,
-      });
-    }
+    const { _id } = req.query
+    if(_id){
+        const findData = await users.findById({_id:_id});
+        return res.status(STATUSCODE.success).json({
+          status: STATUS.success,
+          message: USER.GetUser,
+          data: findData,
+        });
+      }else{
+        const findUser = await users.find();
+        if (findUser) {
+          return res.status(STATUSCODE.success).json({
+            status: STATUS.success,
+            message: USER.GetUser,
+            data: findUser,
+          });
+        }
+    
+      }
   } catch (error) {
     throw error;
   }
