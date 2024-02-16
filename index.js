@@ -10,17 +10,17 @@ console.log("process.env.FILE_PATH", process.env.FILE_PATH);
 process.env.FILE =
   path.join(__dirname, process.env.FILE_PATH) || path.join(__dirname, "public");
 console.log("process.env.FILE", process.env.FILE);
-server.use(express.json());
-server.use("/api/v1", routes);
-server.use("/static", express.static(__dirname + "/public"));
 server.use(
   cors({
     origin: ["http://localhost:3000"],
   })
 );
+server.use(express.json());
+server.use("/api/v1", routes);
+server.use("/static", express.static(__dirname + "/public"));
 
-server.listen(9000, () => {
-  console.log("server is calling in 9000 port");
+server.listen(5000, () => {
+  console.log("server is calling in 5000 port");
 });
 process.on("SIGINT", () => {
   cronJob.stop();
