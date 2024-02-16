@@ -2,7 +2,7 @@ const pagesModel = require("../model/pagesModel");
 const { responseMessage } = require("../constant/messages");
 const slug = require("slugify");
 const { pageValidation } = require("../validation/pageValidation");
-const mongoose  = require("mongoose");
+const { Types } = require("mongoose");
 const { CONTACT, STATUS, STATUSCODE } = responseMessage;
 
 const createPage = async (req, res) => {
@@ -144,9 +144,10 @@ const deletePages = async (req, res) => {
 
 const findPagesDetails = async (req, res) => {
   try {
-    const { _id } = req.query;
+    const { slug } = req.query;
+
     const data = await pagesModel.aggregate([
-      { $match: { _id: mongoose.Types.ObjectId(_id) } },
+      { $match: { slug: req.query.slug } },
       {
         $lookup: {
           from: "contacts",
@@ -158,6 +159,7 @@ const findPagesDetails = async (req, res) => {
       {
         $unwind: {
           path: "$page",
+          preserveNullAndEmptyArrays: true,
         },
       },
       {
@@ -170,8 +172,18 @@ const findPagesDetails = async (req, res) => {
       },
     ]);
     console.log("data", data);
+    return res.status(200).json({
+      success: true,
+      message: "Pages get successfully",
+      data: data,
+    });
   } catch (error) {
     console.log("error", error);
+    return res.status(500).json({
+      success: true,
+      message: "Pages get failed",
+      data: [],
+    });
   }
 };
 module.exports = {
