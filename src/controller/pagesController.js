@@ -55,7 +55,7 @@ const pagesDetail = async (req, res) => {
         isDeleted: false,
       });
       return res.status(STATUSCODE.success).json({
-        status: STATUS.success,
+        success: STATUS.success,
         message: "Pages get successfully",
         data: findData,
       });
@@ -167,7 +167,7 @@ const findPagesDetails = async (req, res) => {
           from: "services",
           localField: "_id",
           foreignField: "page",
-          as: "page",
+          as: "service",
         },
       },
     ]);

@@ -7,7 +7,11 @@ const server = express();
 const cors = require("cors");
 server.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://64.227.130.2:1600",
+    ],
   })
 );
 require("dotenv").config({ path: ".env" });

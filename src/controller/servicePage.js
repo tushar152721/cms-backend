@@ -8,6 +8,7 @@ const create = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Service create success" });
   } catch (err) {
+    console.log("err", err);
     return res
       .status(500)
       .json({ success: false, message: "Service create failed" });
@@ -31,23 +32,22 @@ const update = async (req, res) => {
 
 const get = async (req, res) => {
   try {
-    const { _id } = req.query
-    if(_id){
-        const findData = await serviceModel.findById({_id:_id});
-        return res.status(200).json({
-          status: true,
-          message: "Service get success",
-          data: findData,
-        });
-      }
-      else{
-        const result = await serviceModel.find();
-        return res
-          .status(200)
-          .json({ success: true, message: "Service get success", data: result });
-      }
+    const { _id } = req.query;
+    if (_id) {
+      const findData = await serviceModel.findById({ _id: _id });
+      return res.status(200).json({
+        success: true,
+        message: "Service get success",
+        data: findData,
+      });
+    } else {
+      const result = await serviceModel.find();
+      return res
+        .status(200)
+        .json({ success: true, message: "Service get success", data: result });
+    }
   } catch (err) {
-    console.log('err', err)
+    console.log("err", err);
     return res
       .status(500)
       .json({ success: false, message: "Service get failed" });
